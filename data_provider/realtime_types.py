@@ -99,6 +99,7 @@ class RealtimeSource(Enum):
     AKSHARE_QQ = "akshare_qq"       # 腾讯财经
     TUSHARE = "tushare"             # Tushare Pro
     TICKFLOW = "tickflow"           # TickFlow
+    ZHITU = "zhitu"                 # 智兔数服（ETF 实时行情增强源）
     TENCENT = "tencent"             # 腾讯直连
     SINA = "sina"                   # 新浪直连
     STOOQ = "stooq"                 # Stooq 美股兜底
