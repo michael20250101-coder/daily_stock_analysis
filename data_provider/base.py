@@ -1788,6 +1788,7 @@ class DataFetcherManager:
         from .akshare_fetcher import AkshareFetcher
         from .tushare_fetcher import TushareFetcher
         from .tickflow_fetcher import TickFlowFetcher
+        from .zhitu_fetcher import ZhituFetcher
         from .pytdx_fetcher import PytdxFetcher
         from .baostock_fetcher import BaostockFetcher
         from .yfinance_fetcher import YfinanceFetcher
@@ -1832,6 +1833,11 @@ class DataFetcherManager:
             optional_fetchers.append(FutuFetcher())  # 富途（港股，依赖 OpenD）
         else:
             logger.debug("[数据源初始化] 跳过未配置的 FutuFetcher")
+        zhitu_token = (getattr(config, "zhitu_api_token", None) or "").strip()
+        if zhitu_token:
+            optional_fetchers.append(ZhituFetcher())  # 智兔 ETF 实时行情增强/校验源
+        else:
+            logger.debug("[数据源初始化] 跳过未配置的 ZhituFetcher")
 
         finnhub_api_key = (getattr(config, "finnhub_api_key", None) or "").strip()
         if finnhub_api_key:
@@ -2347,6 +2353,7 @@ class DataFetcherManager:
             "AlphaVantageFetcher": "alphavantage",
             "EfinanceFetcher": "efinance",
             "TushareFetcher": "tushare",
+            "ZhituFetcher": "zhitu",
         }
         return mapping.get(fetcher_name, fetcher_name.replace("Fetcher", "").lower())
 
@@ -2635,13 +2642,15 @@ class DataFetcherManager:
 
                 elif source == "tickflow":
                     fetcher = self._get_fetcher_by_name("TickFlowFetcher", capability="realtime_quote")
-                    if fetcher is not None and hasattr(fetcher, 'get_realtime_quote'):
-                        record_provider_run_started(
-                            data_type="realtime_quote",
-                            provider=fetcher.name,
-                            operation="get_realtime_quote",
-                        )
-                        quote = self._call_fetcher_method(fetcher, 'get_realtime_quote', raw_stock_code or stock_code)
+                elif source == "zhitu":
+                    fetcher = self._get_fetcher_by_name("ZhituFetcher", capability="realtime_quote")
+                if fetcher is not None and hasattr(fetcher, 'get_realtime_quote'):
+                    record_provider_run_started(
+                        data_type="realtime_quote",
+                        provider=fetcher.name,
+                        operation="get_realtime_quote",
+                    )
+                    quote = self._call_fetcher_method(fetcher, 'get_realtime_quote', raw_stock_code or stock_code)
 
                 provider_name = fetcher.name if fetcher is not None else source
                 

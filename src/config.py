@@ -887,6 +887,9 @@ class Config:
     futu_opend_host: Optional[str] = None
     futu_opend_port: int = 11111
     futu_hk_realtime_source_priority: str = "futu,longbridge,akshare,yfinance"
+    zhitu_api_token: Optional[str] = None
+    zhitu_request_timeout: float = 8.0
+    zhitu_priority: int = 0
     finnhub_api_key: Optional[str] = None
     alphavantage_api_key: Optional[str] = None
     longbridge_app_key: Optional[str] = None
@@ -1801,6 +1804,9 @@ class Config:
             futu_opend_host=os.getenv('FUTU_OPEND_HOST') or None,
             futu_opend_port=parse_env_int(os.getenv('FUTU_OPEND_PORT'), 11111, field_name='FUTU_OPEND_PORT', minimum=1, maximum=65535),
             futu_hk_realtime_source_priority=os.getenv('FUTU_HK_REALTIME_SOURCE_PRIORITY', 'futu,longbridge,akshare,yfinance'),
+            zhitu_api_token=os.getenv('ZHITU_API_TOKEN') or None,
+            zhitu_request_timeout=parse_env_float(os.getenv('ZHITU_REQUEST_TIMEOUT'), 8.0, field_name='ZHITU_REQUEST_TIMEOUT', minimum=1.0),
+            zhitu_priority=parse_env_int(os.getenv('ZHITU_PRIORITY'), 0, field_name='ZHITU_PRIORITY'),
             finnhub_api_key=os.getenv('FINNHUB_API_KEY') or None,
             alphavantage_api_key=os.getenv('ALPHAVANTAGE_API_KEY') or None,
             longbridge_app_key=os.getenv('LONGBRIDGE_APP_KEY') or None,
