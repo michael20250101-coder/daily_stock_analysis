@@ -53,6 +53,18 @@ class _DummyConfig(SimpleNamespace):
 
 
 class MainScheduleModeTestCase(unittest.TestCase):
+    def test_fastapi_startup_timeout_defaults_to_packaged_safe_budget(self):
+        with patch.dict(os.environ, {}, clear=True):
+            self.assertEqual(main._resolve_fastapi_startup_timeout(), 60.0)
+
+    def test_fastapi_startup_timeout_env_is_clamped_and_validated(self):
+        with patch.dict(os.environ, {"DSA_FASTAPI_STARTUP_TIMEOUT": "2"}, clear=False):
+            self.assertEqual(main._resolve_fastapi_startup_timeout(), 3.0)
+        with patch.dict(os.environ, {"DSA_FASTAPI_STARTUP_TIMEOUT": "75"}, clear=False):
+            self.assertEqual(main._resolve_fastapi_startup_timeout(), 75.0)
+        with patch.dict(os.environ, {"DSA_FASTAPI_STARTUP_TIMEOUT": "bad"}, clear=False):
+            self.assertEqual(main._resolve_fastapi_startup_timeout(), 60.0)
+
     def setUp(self) -> None:
         self.temp_dir = tempfile.TemporaryDirectory()
         self.env_path = Path(self.temp_dir.name) / ".env"

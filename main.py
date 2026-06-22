@@ -1220,6 +1220,15 @@ def _run_analysis_with_runtime_scheduler_lock(
     return bool(lock_acquired and task_result["ok"])
 
 
+def _resolve_fastapi_startup_timeout() -> float:
+    """Resolve FastAPI background startup wait budget for packaged cold starts."""
+    timeout_raw = os.getenv("DSA_FASTAPI_STARTUP_TIMEOUT", "60")
+    try:
+        return max(3.0, float(timeout_raw))
+    except (TypeError, ValueError):
+        return 60.0
+
+
 def start_api_server(host: str, port: int, config: Config) -> None:
     """
     在后台线程启动 FastAPI 服务
@@ -1290,7 +1299,7 @@ def start_api_server(host: str, port: int, config: Config) -> None:
     thread = threading.Thread(target=run_server, daemon=True)
     thread.start()
 
-    timeout_seconds = 3.0
+    timeout_seconds = _resolve_fastapi_startup_timeout()
     wait_deadline = time.time() + timeout_seconds
     while time.time() < wait_deadline:
         if startup_error:
