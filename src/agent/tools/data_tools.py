@@ -405,11 +405,22 @@ get_daily_history_tool = ToolDefinition(
 
 def _handle_get_chip_distribution(stock_code: str) -> dict:
     """Get chip distribution data."""
+    from data_provider.base import _is_etf_code, normalize_stock_code
+
+    normalized_code = normalize_stock_code(stock_code)
+    if _is_etf_code(normalized_code):
+        return {
+            "code": normalized_code,
+            "unsupported": True,
+            "reason": "etf_chip_distribution_not_supported",
+            "message": f"ETF {normalized_code} does not support chip distribution data; skip this indicator.",
+        }
+
     manager = _get_fetcher_manager()
-    chip = manager.get_chip_distribution(stock_code)
+    chip = manager.get_chip_distribution(normalized_code)
 
     if chip is None:
-        return {"error": f"No chip distribution data available for {stock_code}"}
+        return {"error": f"No chip distribution data available for {normalized_code}"}
 
     return {
         "code": chip.code,
