@@ -5,6 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
 import pytest
+import requests
 
 from data_provider.realtime_types import RealtimeSource
 
@@ -131,3 +132,23 @@ def test_zhitu_fetcher_ignores_zero_optional_fields(mock_get, mock_get_config):
     assert quote.volume is None
     assert quote.turnover_rate is None
     assert quote.pre_close == 2.017
+
+
+@patch("data_provider.zhitu_fetcher.get_config")
+@patch("data_provider.zhitu_fetcher.requests.get")
+def test_zhitu_fetcher_does_not_log_token_on_http_error(mock_get, mock_get_config, caplog):
+    from data_provider.zhitu_fetcher import ZhituFetcher
+
+    token = "demo-token-should-not-appear"
+    mock_get_config.return_value = _cfg(token=token)
+    response = requests.Response()
+    response.status_code = 500
+    response.url = f"https://api.zhituapi.com/fund/real/ssjy/588200?token={token}"
+    mock_get.return_value.raise_for_status.side_effect = requests.HTTPError(
+        "500 Server Error",
+        response=response,
+    )
+
+    assert ZhituFetcher().get_realtime_quote("588200") is None
+    assert token not in caplog.text
+    assert "token=" not in caplog.text

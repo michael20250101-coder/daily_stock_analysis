@@ -75,8 +75,15 @@ class ZhituFetcher(BaseFetcher):
             )
             response.raise_for_status()
             payload = response.json()
+        except requests.HTTPError as exc:
+            status_code = getattr(getattr(exc, "response", None), "status_code", None)
+            logger.warning("[Zhitu] 获取 %s 实时行情失败: HTTP %s", code, status_code or "error")
+            return None
+        except requests.RequestException as exc:
+            logger.warning("[Zhitu] 获取 %s 实时行情失败: %s", code, type(exc).__name__)
+            return None
         except Exception as exc:
-            logger.warning("[Zhitu] 获取 %s 实时行情失败: %s", code, exc)
+            logger.warning("[Zhitu] 获取 %s 实时行情失败: %s", code, type(exc).__name__)
             return None
 
         quote = self._quote_from_payload(code, payload)
