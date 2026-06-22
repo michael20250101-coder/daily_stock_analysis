@@ -22,6 +22,18 @@ from .realtime_types import RealtimeSource, UnifiedRealtimeQuote, safe_float, sa
 logger = logging.getLogger(__name__)
 
 
+def _positive_float(value: Any) -> Optional[float]:
+    """Return positive float values only; Zhitu may return 0 for pre-open placeholders."""
+    parsed = safe_float(value)
+    return parsed if parsed is not None and parsed > 0 else None
+
+
+def _positive_int(value: Any) -> Optional[int]:
+    """Return positive int values only; zero volume/amount placeholders should not block supplements."""
+    parsed = safe_int(value)
+    return parsed if parsed is not None and parsed > 0 else None
+
+
 class ZhituFetcher(BaseFetcher):
     """Zhitu API realtime ETF quote fetcher."""
 
@@ -79,25 +91,25 @@ class ZhituFetcher(BaseFetcher):
         if price is None or price <= 0:
             return None
 
-        volume = safe_int(payload.get("pv"))
+        volume = _positive_int(payload.get("pv"))
         if volume is None:
-            volume = safe_int(payload.get("v"))
+            volume = _positive_int(payload.get("v"))
 
         return UnifiedRealtimeQuote(
             code=code,
             source=RealtimeSource.ZHITU,
             price=price,
-            open_price=safe_float(payload.get("o")),
-            high=safe_float(payload.get("h")),
-            low=safe_float(payload.get("l")),
-            pre_close=safe_float(payload.get("yc")),
+            open_price=_positive_float(payload.get("o")),
+            high=_positive_float(payload.get("h")),
+            low=_positive_float(payload.get("l")),
+            pre_close=_positive_float(payload.get("yc")),
             change_amount=safe_float(payload.get("ud")),
             change_pct=safe_float(payload.get("pc")),
             amplitude=safe_float(payload.get("zf")),
-            amount=safe_float(payload.get("cje")),
+            amount=_positive_float(payload.get("cje")),
             volume=volume,
-            turnover_rate=safe_float(payload.get("tr")),
-            pe_ratio=safe_float(payload.get("pe")),
+            turnover_rate=_positive_float(payload.get("tr")),
+            pe_ratio=_positive_float(payload.get("pe")),
             provider_timestamp=ZhituFetcher._normalize_provider_time(payload.get("t")),
         )
 

@@ -99,3 +99,35 @@ def test_zhitu_fetcher_returns_none_for_incomplete_quote(mock_get, mock_get_conf
     mock_get.return_value = _FakeResponse({"p": 0, "t": "2026-06-18 15:00:18"})
 
     assert ZhituFetcher().get_realtime_quote("588000") is None
+
+
+@patch("data_provider.zhitu_fetcher.get_config")
+@patch("data_provider.zhitu_fetcher.requests.get")
+def test_zhitu_fetcher_ignores_zero_optional_fields(mock_get, mock_get_config):
+    from data_provider.zhitu_fetcher import ZhituFetcher
+
+    mock_get_config.return_value = _cfg()
+    mock_get.return_value = _FakeResponse(
+        {
+            "p": 2.017,
+            "o": 0,
+            "h": 0,
+            "l": 0,
+            "yc": 2.017,
+            "cje": 0,
+            "pv": 0,
+            "tr": 0,
+            "t": "2026-06-22 09:20:26",
+        }
+    )
+
+    quote = ZhituFetcher().get_realtime_quote("588000")
+
+    assert quote.price == 2.017
+    assert quote.open_price is None
+    assert quote.high is None
+    assert quote.low is None
+    assert quote.amount is None
+    assert quote.volume is None
+    assert quote.turnover_rate is None
+    assert quote.pre_close == 2.017
