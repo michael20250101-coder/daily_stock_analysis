@@ -2043,7 +2043,7 @@ async function createWindow() {
   try {
     const healthInfo = await waitForHealth(
       healthUrl,
-      60000,
+      300000,
       250,
       1500,
       () => {
