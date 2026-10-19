@@ -1063,7 +1063,7 @@ class Config:
     agent_nl_routing: bool = False  # Enable natural language routing in bot dispatcher
     agent_arch: str = "single"     # Agent architecture: 'single' (legacy) or 'multi' (orchestrator)
     agent_orchestrator_mode: str = "standard"  # Orchestrator mode: quick/standard/full/specialist
-    agent_orchestrator_timeout_s: int = 600  # Cooperative timeout budget for the whole multi-agent pipeline
+    agent_orchestrator_timeout_s: int = 900  # Cooperative timeout budget for the whole multi-agent pipeline
     agent_technical_agent_timeout_s: float = 0
     agent_intel_agent_timeout_s: float = 0
     agent_risk_agent_timeout_s: float = 0
@@ -2002,7 +2002,7 @@ class Config:
             agent_orchestrator_mode=os.getenv('AGENT_ORCHESTRATOR_MODE', 'standard').lower(),
             agent_orchestrator_timeout_s=parse_env_int(
                 os.getenv('AGENT_ORCHESTRATOR_TIMEOUT_S'),
-                600,
+                900,
                 field_name='AGENT_ORCHESTRATOR_TIMEOUT_S',
                 minimum=0,
             ),

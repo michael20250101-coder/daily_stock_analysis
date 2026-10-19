@@ -4149,13 +4149,13 @@ _FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "is_sensitive": False,
         "is_required": False,
         "is_editable": True,
-        "default_value": "600",
+        "default_value": "900",
         "options": [],
         "validation": {"min": 0, "max": 3600},
         "display_order": 62,
         "help_key": "settings.agent.AGENT_ORCHESTRATOR_TIMEOUT_S",
         "examples": [
-            "AGENT_ORCHESTRATOR_TIMEOUT_S=600",
+            "AGENT_ORCHESTRATOR_TIMEOUT_S=900",
             "AGENT_ORCHESTRATOR_TIMEOUT_S=0",
         ],
         "docs": [
@@ -4255,7 +4255,7 @@ _FIELD_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "is_editable": True,
         "default_value": "180",
         "options": [],
-        "validation": {"min": 30, "max": 600},
+        "validation": {"min": 30, "max": 1800},
         "display_order": 65,
         "help_key": "settings.agent.DEEP_RESEARCH",
         "examples": [

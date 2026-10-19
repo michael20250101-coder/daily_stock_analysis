@@ -2941,6 +2941,21 @@ class DataFetcherManager:
         # Normalize code (strip SH/SZ prefix etc.)
         stock_code = normalize_stock_code(stock_code)
 
+        # ETFs do not have stock-style chip distribution; skip before provider fallback.
+        if _is_etf_code(stock_code):
+            logger.info(f"[筹码分布] {stock_code} 是 ETF，不支持筹码分布，跳过")
+            record_provider_run(
+                data_type="chip",
+                provider="ETFUnsupported",
+                operation="get_chip_distribution",
+                success=False,
+                latency_ms=0,
+                error_type="not_supported",
+                error_message="ETF chip distribution is not supported",
+                record_count=0,
+            )
+            return None
+
         from .realtime_types import get_chip_circuit_breaker
         from src.config import get_config
 
