@@ -38,7 +38,11 @@ class DesktopPackagingAssetsTestCase(unittest.TestCase):
         )
 
         self.assertIn("--collect-data akshare", macos_script)
+        self.assertIn("--collect-all fake_useragent", macos_script)
         self.assertIn("'--collect-data', 'akshare'", windows_script)
+        self.assertIn("'--collect-all', 'fake_useragent'", windows_script)
+        self.assertIn("fake_useragent/data/browsers.jsonl", macos_script)
+        self.assertIn("_internal\\fake_useragent\\data\\browsers.jsonl", windows_script)
         self.assertIn("_internal/akshare/file_fold/calendar.json", macos_script)
         self.assertIn("_internal\\akshare\\file_fold\\calendar.json", windows_script)
 

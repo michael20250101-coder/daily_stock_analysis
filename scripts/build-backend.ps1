@@ -144,6 +144,7 @@ $pyInstallerArgs = @(
   '--collect-data', 'litellm',
   '--collect-data', 'tiktoken',
   '--collect-data', 'akshare',
+  '--collect-all', 'fake_useragent',
   '--collect-data', 'fxmacrodata_public',
   '--collect-all', 'py_mini_racer',
   '--collect-all', 'src.services.screening',
@@ -193,6 +194,15 @@ if (-not (Test-Path $packagedAkshareCalendar)) {
 }
 if (-not (Test-Path $packagedAkshareCalendar)) {
   throw 'Packaged AkShare calendar data not found under dist\backend\stock_analysis.'
+}
+
+Write-Host 'Verifying packaged fake_useragent data...'
+$packagedBrowsers = Join-Path 'dist\backend\stock_analysis' '_internal\fake_useragent\data\browsers.jsonl'
+if (-not (Test-Path $packagedBrowsers)) {
+  $packagedBrowsers = Join-Path 'dist\backend\stock_analysis' 'fake_useragent\data\browsers.jsonl'
+}
+if (-not (Test-Path $packagedBrowsers)) {
+  throw 'Packaged fake_useragent browsers.jsonl not found under dist\backend\stock_analysis.'
 }
 
 Write-Host 'Verifying static asset references (packaged)...'

@@ -120,7 +120,7 @@ for module in "${hidden_imports[@]}"; do
 done
 
 pushd "${ROOT_DIR}" >/dev/null
-cmd=("${PYTHON_BIN}" -m PyInstaller --name stock_analysis --onedir --noconfirm --noconsole --runtime-hook "${SCRIPT_DIR}/pyinstaller_runtime_compat.py" --add-data "static:static" --add-data "strategies:strategies" --add-data "src/assets/share_image:src/assets/share_image" --collect-data litellm --collect-data tiktoken --collect-data akshare --collect-data fxmacrodata_public)
+cmd=("${PYTHON_BIN}" -m PyInstaller --name stock_analysis --onedir --noconfirm --noconsole --runtime-hook "${SCRIPT_DIR}/pyinstaller_runtime_compat.py" --add-data "static:static" --add-data "strategies:strategies" --add-data "src/assets/share_image:src/assets/share_image" --collect-data litellm --collect-data tiktoken --collect-data akshare --collect-all fake_useragent --collect-data fxmacrodata_public)
 cmd+=("--collect-all" "src.services.screening")
 cmd+=("--collect-all" "futu")
 cmd+=("--collect-all" "py_mini_racer")
@@ -179,6 +179,16 @@ if [[ ! -f "${packaged_akshare_calendar}" ]]; then
 fi
 if [[ ! -f "${packaged_akshare_calendar}" ]]; then
   echo "ERROR: packaged AkShare calendar data not found under ${packaged_root}."
+  exit 1
+fi
+
+log "Verifying packaged fake_useragent data..."
+packaged_browsers="${packaged_root}/_internal/fake_useragent/data/browsers.jsonl"
+if [[ ! -f "${packaged_browsers}" ]]; then
+  packaged_browsers="${packaged_root}/fake_useragent/data/browsers.jsonl"
+fi
+if [[ ! -f "${packaged_browsers}" ]]; then
+  echo "ERROR: packaged fake_useragent browsers.jsonl not found under ${packaged_root}."
   exit 1
 fi
 
